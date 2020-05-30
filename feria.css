@@ -1,0 +1,52 @@
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    background: rgb(255, 227, 205);
+    font-family: sans-serif;
+}
+
+#contents {
+    padding: 1rem;
+    margin: 0 auto;
+    max-width: 900px;
+    font-size: 2.5rem;
+}
+
+.tabla {
+    text-align: center;
+    width: 100%;
+    font-size: 2.4rem;
+
+}
+
+.tabla table, .tabla th, .tabla td {
+    border: 2px solid rgb(125, 218, 255);;
+    border-collapse: collapse;
+    padding: 1rem;
+}
+
+#tabla-verduras th, #tabla-verduras td{
+    background: rgb(206, 241, 255);
+}
+
+.cantidad {
+    background: rgb(232, 248, 255);
+    border: none;
+    width: 60%;
+}
+
+.large {
+    font-size: 2.5rem;
+    height: 5rem;
+}
+
+#submit-but {
+    padding: 1rem;
+    font-size: 2.5rem;
+}
+
+#info-contacto .contacto {
+    width: 50%;
+}
