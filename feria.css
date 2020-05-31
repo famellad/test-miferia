@@ -21,7 +21,11 @@ html, body {
 
 }
 
-.tabla table, .tabla th, .tabla td {
+.table .header {
+    font-size: 4rem;
+}
+
+.table table, .tabla th, .tabla td {
     border: 2px solid rgb(125, 218, 255);;
     border-collapse: collapse;
     padding: 1rem;

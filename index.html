@@ -1,51 +1,228 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>Prueba</title>
-        <link rel="stylesheet" href="feria.css" />
-    </head>
-    <body>
-        <script>
-            function confirmData() {
-                var d = new Date();
-                var subject = "Pedido ".concat(d.getDate(), " de ", d.getMonth(), " de ", d.getFullYear());
-                var body = "";
-                body = body.concat("Encargo de:<br>");
-                if (document.getElementById("nlechuga").value != 0)
-                    body = body.concat("- ", document.getElementById("nlechuga").value, " lechuga(s)<br>");
-                if (document.getElementById("ntomate").value != 0)
-                    body = body.concat("- ", document.getElementById("ntomate").value, " de tomate(s)<br><br>");
-                body = body.concat("Contacto:<br>");
-                body = body.concat(document.getElementById("nombre").value, "<br>");
-                body = body.concat(document.getElementById("telefono").value, "<br>");
-                //%0D%0A
-                var hrefString = "mailto:famellad@gmail.com?subject=".concat(subject, "&body=", body);
-                window.location.href = hrefString;
+<head>
+    <title>Prueba Mi Feria</title>
+    <link rel="stylesheet" href="feria.css" />
+    <script>
+        var listDict = {};
+
+        function generateID (name) {
+            // Strings to hold the final ID and original name
+            var ID = "";
+            var origName = name;
+
+            // Sanitize the string
+            {
+            name = name.replace("(", "").replace(")", "");
+            name = name.toLowerCase();
+            name = name.replace("ñ", "n");
+            name = name.replace("á", "a");
+            name = name.replace("é", "e");
+            name = name.replace("í", "i");
+            name = name.replace("ó", "o");
+            name = name.replace("ú", "u");
+            name = name.replace("ú", "u");
+            name = name.replace("ç", "c");
             }
-        </script>
-        <div id="contents">
-            <form id="lista">
-                <table class="tabla" id="tabla-verduras">
-                    <tr>
-                        <th colspan="3">Verduras</th>
-                    </tr>
-                    <tr>
-                        <td>Lechugas </td>
-                        <td id="plechuga">$750/U</td>
-                        <td><input class="cantidad large" id="nlechuga" type="number" placeholder="0" min="0" step="1" /> U</td>
-                    </tr>
-                    <tr>
-                        <td>Tomates </td>
-                        <td id="ptomate">$1200/Kg</td>
-                        <td><input class="cantidad large" id="ntomate" type="number" placeholder="0" min="0" step="0.1" /> Kg</td>
-                    </tr>
-                </table>
-                <div id="info-contacto">
-                    <div>Nombre: <input class="large contacto" id="nombre" type="text"></div>
-                    <div>Direccion: <input class="large contacto" id="direccion" type="text"></div>    
-                    <div>Celular: <input class="large contacto" id="telefono" type="text"></div>    
-                </div>
-              </form>
-            <button id="submit-but" type="button" onclick="confirmData()">Revisar</button>
-        </div>
-    </body>
+
+            // Remove spaces
+            nameSplit = name.split(" ");
+
+            for (let i = 0; i < nameSplit.length; i++) {
+                ID += nameSplit[i];
+            }
+
+            // Add to "dictionary"
+            //listID[listID.length] = ID;
+            //listName[listID.length - 1] = origName;
+            listDict[ID] = origName;
+
+            return ID;
+        }
+
+        function addSeparator (value) {
+            var c = 0;
+            var sepValue = "";
+
+            for (let i = value.length - 1; i >= 0; i--) {
+                if (c == 3) {
+                    sepValue = "," + sepValue;
+                    c = 0;
+                }
+                else c++;
+
+                sepValue = value[i] + sepValue;
+            }
+
+            return sepValue;
+        }
+
+        function parsePricing (row, lineElements) {
+            // Create new cell to hold data
+            var cell = row.insertCell(-1);
+
+            // Write price per unit
+            cell.textContent = "$" + addSeparator(lineElements[2]) + " / " + lineElements[1];
+        }
+
+        function selectorCell (row, lineElements) {
+            // Create new cell to hold data
+            var cell = row.insertCell(-1);
+            // Create new input element as the selector
+            var input = document.createElement("input");
+            // Create a span element to hold the unit
+            var span = document.createElement("span");
+
+            // Set selector as number and initialize at 0
+            input.type = "number";
+            input.placeholder = 0;
+            input.id = generateID(lineElements[0]);
+            input.classList.add("cantidad");
+            input.classList.add("large");
+            input.min = "0";
+            if (lineElements[1] == "Kg") input.step = "0.1";
+            else input.step = "1";
+
+            // Write unit to span
+            span.textContent = lineElements[1];
+
+            // Append elements to cell
+            cell.appendChild(input);
+            cell.appendChild(span);
+        }
+
+        function generateTable (csvLines) {
+            // Define where to put the table
+            var tl = document.getElementById("tab");
+
+            // Create the table object
+            var table = document.createElement("table");
+            //table.border = 1;
+            table.className = "table";
+            table.id = "tabla-verduras";
+            // TODO define id and other attributes
+
+            // Iterate over csv lines
+            for (let i = 0; i < csvLines.length; i++) {
+                // Generate a new row object
+                var row = table.insertRow(-1);
+                
+                // Parse the csv line
+                lineElements = csvLines[i].split(',');
+
+                // Handle the header the header
+                if (lineElements[0][0] == '#') {
+                    // Create a cell for the header
+                    var cell = row.insertCell(-1);
+
+                    cell.className = "header";
+
+                    // Merge cells
+                    cell.colSpan = 3;
+                    // Write cell
+                    cell.textContent = lineElements[0].split("#")[1];
+                }
+                // Handle everything else
+                else {
+                    // Write name of product
+                    var nameCell = row.insertCell(-1);
+                    nameCell.textContent = lineElements[0];
+
+                    // Handle the pricing column
+                    parsePricing(row, lineElements);
+
+                    // Handle the selection column
+                    selectorCell(row, lineElements);
+                }
+            }
+
+            // Finally add the table to the document
+            tl.appendChild(table);
+        }
+
+        function getCSV () {
+            return new Promise(
+                function (resolve, reject) {
+                    const request = new XMLHttpRequest();
+                    request.onload = function () {
+                        if (this.status === 200) {
+                            // Request succeeded
+                            resolve(this.response);
+                        }
+                        else {
+                            // There is a problem
+                            reject(new Error(this.statusText));
+                        }
+                    };
+                    request.onerror = function () {
+                        reject( new Error(
+                            'XMLHttpRequest Error: ' + this.statusText ));
+                    };
+                    request.open('GET', 'listado.csv');
+                    request.send();
+                });
+        }
+
+        function confirmData () {
+            // Get the current day
+            var d = new Date();
+
+            // Assign the current date to the mail subject
+            var subject = "Pedido del ".concat(d.getDate(), " de ", d.getMonth(), " de ", d.getFullYear());
+            
+            // Init empty variable to hold the body
+            var body = "";
+
+            // Opening
+            body = body.concat("Encargo de:<br>");
+
+            // List itself, iterates over ids
+            keys = Object.keys(listDict);
+
+            for (let i = 0; i < keys.length; i++) {
+                // Check wheter there is a value
+                console.log(document.getElementById(keys[i]).value);
+                if (document.getElementById(keys[i]).value != 0 
+                && document.getElementById(keys[i]).value != undefined
+                && document.getElementById(keys[i]).value != null
+                && document.getElementById(keys[i]).value != "")
+                    body = body.concat("- ", document.getElementById(keys[i]).value, " ", listDict[keys[i]], "<br>");
+            }
+
+            // Include contact info
+            body = body.concat("<br>Contacto:<br>");
+            body = body.concat(document.getElementById("nombre").value, "<br>");
+            body = body.concat(document.getElementById("telefono").value, "<br>");
+            body = body.concat(document.getElementById("direccion").value, "<br>");
+            //%0D%0A
+            var hrefString = "mailto:famellad@gmail.com?subject=".concat(subject, "&body=", body);
+            window.location.href = hrefString;
+        }
+
+        getCSV().then(
+            function (value) {
+                // This is executed if the CSV is properly fetched
+                // The contents of the file are held in value
+                var textLines = value.split("\n");
+                generateTable(textLines);
+            },
+            function (reason) {
+                console.error("Something wrong", reason);
+            });
+
+    </script>
+</head>
+<body>
+    <div id="contents">
+        <form id="lista">
+            <div id="tab"></div>
+            <div id="info-contacto">
+                <div>Nombre: <input class="large contacto" id="nombre" type="text"></div>
+                <div>Direccion: <input class="large contacto" id="direccion" type="text"></div>    
+                <div>Celular: <input class="large contacto" id="telefono" type="text"></div>    
+            </div>
+        </form>
+        <button id="submit-but" type="button" onclick="confirmData()">Revisar</button>
+    </div>
+</body>
 </html>
