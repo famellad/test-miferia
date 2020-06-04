@@ -55,7 +55,7 @@ function parsePricing (row, lineElements) {
     // Create new cell to hold data
     var cell = row.insertCell(-1);
 
-    cell.className = "cell";
+    cell.className = "price-cell";
 
     // Write price per unit
     cell.textContent = "$" + addSeparator(lineElements[2]) + " / " + lineElements[1];
@@ -69,7 +69,8 @@ function selectorCell (row, lineElements) {
     // Create a span element to hold the unit
     var span = document.createElement("span");
 
-    cell.className = "cell";
+    cell.className = "sel-cell";
+    span.className = "unit";
 
     // Set selector as number and initialize at 0
     input.type = "number";
@@ -124,7 +125,7 @@ function generateTable (csvLines) {
         else {
             // Write name of product
             var nameCell = row.insertCell(-1);
-            nameCell.className = "cell";
+            nameCell.className = "name-cell";
 
             nameCell.textContent = lineElements[0];
 

@@ -29,7 +29,8 @@ html, body {
     margin: 1rem;
 }
 
-#tabla-verduras .cell{
+#tabla-verduras .sel-cell, #tabla-verduras .price-cell, #tabla-verduras .name-cell{
+    padding: 0.2rem;
     background: rgb(206, 241, 255);
 }
 
@@ -42,10 +43,21 @@ html, body {
     background: rgb(163, 217, 238);
 }
 
+#tabla-verduras .name-cell {
+    width: 40%;
+}
+
 .cantidad {
-    background: rgb(232, 248, 255);
+    /*background: rgb(232, 248, 255);*/
+    text-align: right;
+    background: rgb(227, 247, 255);
     border: none;
-    width: 60%;
+    margin-right: 0.2rem;
+    width: 3rem;
+}
+
+.cell .unit {
+    font-size: 1rem;
 }
 
 .large {
